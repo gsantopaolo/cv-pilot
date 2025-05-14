@@ -1,0 +1,30 @@
+# Core AI orchestration
+crewai==0.118.0
+crewai[tools]==0.42.2
+
+# LLM providers
+openai==1.77.0
+anthropic==0.50.0
+
+# Configuration & YAML parsing
+python-dotenv==1.1.0
+PyYAML==6.0.2
+
+# Optional code parsing/helper libraries
+javalang==0.13.0
+
+# eventually to add testing
+pytest==8.3.5
+
+
+mdutils==1.6.0
+
+
+torch==2.7.0
+torchaudio==2.7.0
+torchvision==0.22.0
+transformers==4.51.3
+langtrace-python-sdk==3.8.17
+langchain-community==0.3.23
+
+docling==2.31.2

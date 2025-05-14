@@ -1,0 +1,24 @@
+generate_motivation_letter:
+  description: >
+    Research the target company at {company_url}. Search for their core values. 
+    Analyze the job posting at the URL provided {job_posting_url} or job_advertise.md.
+    Read **new_resume.md**.
+    Draft a tailored motivation letter:
+    1. Confirm presence of **job_posting_url** or **job_advertise.md**.
+    2. Fetch and scrape public information about the company (mission, vision, core values, recent news).
+    3. Read the candidate’s **new_resume.md** for relevant achievements and aspirations.
+    4. Synthesize insights into a motivation letter structure:
+       - Introduction hooking on a shared value or recent milestone
+       - 2–3 body paragraphs mapping core values to candidate experiences
+       - Conclusion reaffirming enthusiasm and call to action
+    5. List all sources and files read for traceability.
+  expected_output: >
+    A **motivation_letter.md** file saved via FileWriterTool containing:
+    - letter:
+        - introduction
+        - body (with value-to-experience mappings)
+        - conclusion
+    - sources_and_files section.
+  agent: motivation_letter_editor
+  output_file: "motivation_letter.md"
+  human_input: true
