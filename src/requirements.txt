@@ -28,3 +28,4 @@ langtrace-python-sdk==3.8.17
 langchain-community==0.3.23
 
 docling==2.31.2
+mlx-vlm==0.1.26
