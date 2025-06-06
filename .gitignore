@@ -30,3 +30,4 @@ src/docs/
 src/db/
 server.txt
 src/new_resume.md
+src/docs/application_state.json
