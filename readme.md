@@ -1,4 +1,3 @@
-````markdown
 🚀 **CV-Pilot**
 
 Have you ever felt the sting of sending out dozens of applications only to hear crickets? 😖 You polish your resume, click “Send,” and… nothing. No calls. No next steps. Frustrating, right? Ever wondered why some people seem to get straight to the first HR screening while others don’t even get a glance? The answer often lies in **automated resume processing**—the infamous Applicant Tracking Systems (ATS) that parse your CV for keywords before a human even sees it. If your resume doesn’t speak ATS’s language, it might never make it to a recruiter’s desk. 😱
@@ -100,7 +99,7 @@ Result? Your resume has a much higher probability of making it past the bots and
    ```bash
    git clone https://github.com/gsantopaolo/cv-pilot.git
    cd cv-pilot
-````
+   ```
 
 2. **Create & Activate a Virtual Environment**
 
