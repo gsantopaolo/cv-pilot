@@ -27,6 +27,6 @@ excluded/
 src/docs/
 
 .idea/
-
+src/db/
 server.txt
-
+src/new_resume.md

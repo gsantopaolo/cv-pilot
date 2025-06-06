@@ -1,75 +1,54 @@
 extract_job_requirements:
   description: >
-    Your primary objective is to extract and categorize all key skills, experiences, and qualifications from the job advertisement.
-    1. Use DirectoryReadTool to list all files and confirm the presence of **job_advertise.md**.
-    2. Use FileReadTool and/or MDXSearchTool to read the full contents of **job_advertise.md**.
-    3. Make a checklist of files read and verify against DirectoryReadTool output.
-    4. Identify each required skill, qualification, and experience.
-    5. Categorize requirements into:
-       - Technical skills
-       - Soft skills
-       - Education & certifications
-       - Professional experience
+    Your primary objective is to extract and categorize all key skills, experiences, and qualifications 
+    from the job advertisement.
+    1. Use FileReadTool and/or MDXSearchTool to read the full contents of the job descrition {job_desc_path}
+    2. Use FileReadTool and/or MDXSearchTool to read the full contents of the resume {resume_path}
+    3. Extract key terms and phrases for ATS comparison by using the KeywordsAnalyzerTool:
+       - use the table that the KeywordsAnalyzerTool will output
+       - Identify keywords not present in the resume
+    4. Search web via SerperDevTool and ScrapeWebsiteTool and use the LLM with the sole purpose to add all 
+       the missing keywords from the job description to the resume
+       Create a nice story how to integrate those words in the resume
     If any files cannot be read, explicitly state the missing files.
   expected_output: >
-    A structured YAML list detailing:
+    A structured list detailing:
     - technical_skills: [...]
     - soft_skills: [...]
     - education_and_certifications: [...]
     - professional_experience: [...]
-    Additionally, include a “files_read” section listing all files accessed for verification.
+    Additionally, when you are done, include a “files_read” section listing all files accessed for verification.
   agent: researcher
-  human_input: true
-
-compile_candidate_profile:
-  description: >
-    Compile a comprehensive personal and professional profile using the provided resume versions and guidance notes.
-    1. Use DirectoryReadTool to list all **cv_*.md** and **notes.md** files.
-    2. Read each **cv_*.md** and **notes.md** using FileReadTool and/or MDXSearchTool.
-    3. Verify all expected files are read; list any missing ones.
-    4. Use all the information in all the provided CVs to craft a new CV with the following sections:
-       - personal_information
-       - core_skills
-       - project_experiences
-       - contributions_and_achievements
-       - interests_and_values
-       - communication_style
-    5. Maintain fidelity to source documents; do not hallucinate.
-  expected_output: >
-    A detailed profile document string structured as a YAML object with the sections above,
-    and a “files_read” list for auditability.
-    Additionally, include a “files_read” section listing all files accessed for verification.
-  agent: profiler
-  human_input: true
 
 tailor_resume:
   description: >
-    Using the outputs from **extract_job_requirements** and **compile_candidate_profile**, 
-    tailor the candidate’s new resume:
-    1. Load previous tasks outputs (requirements and profile).
-    2. Use all the info in the provided curriculum from the candidate
-    3. Create and craft each section of the new resume:
-       - summary
-       - work_experience
-       - skills
-       - education
-    4. Emphasize alignment between candidate’s strengths and job requirements.
-    5. Use FileReadTool and FileWriterTool with full paths to read/update/write **new_resume.md**.
-    6. Validate that no information is invented beyond source documents.
+    Compile a comprehensive personal and professional profile using the provided resume.
+    Use all the information provided by the previous task.
+    1. Use FileReadTool and/or MDXSearchTool to read the full contents of the job descrition {job_desc_path}
+    2. Use FileReadTool and/or MDXSearchTool to read the full contents of the resume {resume_path}
+    3. Verify all expected files are read; list any missing ones.
+    4. Craft a new resume based on the old one and the suggestions from the previous task 
+    5. Maintain fidelity to source documents; do not hallucinate.
+    6. Use the KeywordsAnalyzerTool against the new resume you created and the job advertise, if the words matching or the 
+       cosine similiarity is less than 85%, craft a new resume taking in cosnideration the table of missing keywords from the
+       job advertise to the resume you create.
+    7. Repeat the process as many times you need until the KeywordsAnalyzerTool used to compare the new resume you created and 
+       the job advertise words matching and the cosine similiarity equal or greater than 85%.
+       If it is not repeat all the points above again.
   expected_output: >
-    An updated **new_resume.md** file saved via FileWriterTool, containing:
+    A detailed resume in MD format with at least below and a KeywordsAnalyzerTool keyword matching and cosine similarity not less than 85%
     - revised summary
     - reorganized work_experience entries
     - highlighted skills
     - tailored education section
-    Plus a YAML “changes_log” summarizing edits.
-    The resume **MUST** include all the information found in the provided CVs relevant to the job application.
-    Also, not relevant information shall not be cut our completely but it is importnat to include finding a way 
-    so that they are also included.
-    Tailoring a resume for a specific job application does not mean not mentioning candidate's job experiences or 
-    knowledge not relevant to the advertise.
-    Tailoring means only making the matching knowledge and skills be more relevant
+    - Objective Statement summarizing key skills and experience relevant to the target role
+    - Specific project details and measurable accomplishments
+    - **EXTREMLY IMPORTANT** the generated resume **MUST** be compared with the with KeywordsAnalyzerTool and the job 
+      description and if it is less than 85% do it again and again untill you reach a scoring greather than 85%
+    - **MANDATORY** Output the newly generated resume and the result of the newly gemnerated resume compared with 
+      KeywordsAnalyzerTool and the job description and wait for the human input.
   agent: resume_strategist
-  output_file: "new_resume.md"
   human_input: true
+  markdown: true
+  output_file: new_resume.md
 

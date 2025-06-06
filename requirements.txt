@@ -1,0 +1,39 @@
+# Core AI orchestration
+crewai
+crewai_tools
+
+# LLM providers
+openai
+anthropic==0.50.0
+
+# Configuration & YAML parsing
+python-dotenv==1.1.0
+PyYAML==6.0.2
+
+yake==0.4.8
+
+# eventually to add testing
+pytest==8.3.5
+
+
+mdutils==1.6.0
+
+
+# torch==2.7.0
+# torchaudio==2.7.0
+# torchvision==0.22.0
+# transformers==4.51.3
+# langtrace-python-sdk==3.8.17
+# langchain-community==0.3.23
+
+# docling==2.31.2
+# mlx-vlm==0.1.26
+PyMuPDF
+
+langtrace-python-sdk
+nltk==3.6.2
+# scikit_learn==0.24.2
+tabulate==0.8.9
+# textract==1.6.3
+spacy==3.8.7 #python -m spacy download en_core_web_sm
+# https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.0.0/en_core_web_sm-3.0.0.tar.gz#egg=en_core_web_sm
