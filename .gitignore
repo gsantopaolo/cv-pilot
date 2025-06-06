@@ -24,7 +24,6 @@ deployment/terraform/.terraform/
 # ignore data path
 data/
 excluded/
-src/docs/
 
 .idea/
 src/db/
