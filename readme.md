@@ -1,20 +1,22 @@
+````markdown
 🚀 **CV-Pilot**
 
-CV-Pilot is an AI-powered toolkit composed of two distinct pipelines—**gen\_resume** and 
-**gen\_motivation**—that automate the creation of a tailored CV and a personalized motivation letter. 
-Each pipeline runs independently: first, **gen\_resume** analyzes your raw resume and the 
-job posting to produce a data-driven CV; then, **gen\_motivation** scrapes company 
-information and structures a compelling cover letter. 
-Human-in-the-loop checkpoints ensure accuracy and alignment at every stage. ✨🤖
+Have you ever felt the sting of sending out dozens of applications only to hear crickets? 😖 You polish your resume, click “Send,” and… nothing. No calls. No next steps. Frustrating, right? Ever wondered why some people seem to get straight to the first HR screening while others don’t even get a glance? The answer often lies in **automated resume processing**—the infamous Applicant Tracking Systems (ATS) that parse your CV for keywords before a human even sees it. If your resume doesn’t speak ATS’s language, it might never make it to a recruiter’s desk. 😱
+
+**CV-Pilot** swoops in to solve this problem. It reads your raw resume 📄, compares it against a job advertisement 📋, and crafts a **tailored CV** that maximizes your chances of passing the ATS hurdle and landing that coveted first interview. 🎯✨
 
 ---
 
 ## 📋 Table of Contents
 
-* [✨ Features](#✨-features)
+* [✨ Why CV-Pilot?](#✨-why-cv-pilot)
+* [🌟 Features](#🌟-features)
 * [🔧 Requirements](#🔧-requirements)
 * [🚀 Installation](#🚀-installation)
 * [🎬 Usage](#🎬-usage)
+  * [1. Generate a Tailored Resume (`gen_application.py`)](#1-generate-a-tailored-resume-gen_applicationpy)
+  * [2. Generate a Motivation Letter (`gen_motivation.py`)](#2-generate-a-motivation-letter-gen_motivationpy)
+  * [3. Analyze Keyword Matching & Similarity (`analyze.py`)](#3-analyze-keyword-matching--similarity-analyzepy)
 * [🔄 Process Overview](#🔄-process-overview)
 * [📝 Human-in-the-Loop Feedback](#📝-human-in-the-loop-feedback)
 * [⚠️ Known Issues & Troubleshooting](#⚠️-known-issues--troubleshooting)
@@ -23,148 +25,385 @@ Human-in-the-loop checkpoints ensure accuracy and alignment at every stage. ✨�
 
 ---
 
-## ✨ Features
+## ✨ Why CV-Pilot?
 
-* **Separate Pipelines**:
+😩 Tired of hearing nothing back? CV-Pilot is here to change your luck.  
+ATS software scans resumes for relevancy: keywords, skills, experiences. If your resume doesn’t align perfectly with the job description, it’s filtered out—long before a human sets eyes on it. 😤 CV-Pilot **automates** this alignment:
 
-  * **gen\_resume** crafts a tailored CV based on your raw resume and job specifications. 📄
-  * **gen\_motivation** generates a personalized motivation letter using company and posting details. ✉️
-* **Automated Research**: Scrapes company website and parses job postings (URL or `job_advertise.md`). 🌐🔍
-* **Agentic Orchestration**: Multi-agent workflows in each pipeline handle extraction, profiling, drafting, and tailoring. 🤖
-* **Traceability**: Produces `application_state.json` with full audit trail of sources, inputs, and outputs. 📑
-* **Human Checkpoints**: Pauses for your review after each pipeline completes its draft. 👥
-* **File Outputs**:
+1. **Reads** your raw resume (Markdown, TXT, or PDF).  
+2. **Parses** the job advertisement (Markdown or URL).  
+3. **Extracts** the crucial keywords and requirements.  
+4. **Generates** a new, ATS-friendly resume that highlights your expertise and matches the job’s language.
 
-  * **gen\_resume** → `docs/new_resume.md`
-  * **gen\_motivation** → `docs/motivation_letter.md`
-  * Both pipelines → `docs/application_state.json`
+Result? Your resume has a much higher probability of making it past the bots and into the hands of a recruiter. 🚀🎉
+
+---
+
+## 🌟 Features
+
+* **Automated Resume Tailoring**  
+  - **Script**: `gen_application.py`  
+  - Reads your raw CV and the job description.  
+  - Uses a multi-agent Crew AI workflow to extract keywords, match your skills/experiences, and draft a job-specific CV.  
+  - Outputs:  
+    - `docs/new_resume.md` (tailored resume)  
+    - `docs/application_state.json` (audit trail of every step)  
+
+* **Personalized Motivation Letter**  
+  - **Script**: `gen_motivation.py`  
+  - Scrapes the target company’s website for mission, values, culture.  
+  - Reads the job posting (Markdown file or URL).  
+  - Drafts a structured cover letter: introduction, body, conclusion.  
+  - Outputs:  
+    - `docs/motivation_letter.md` (tailored motivation letter)  
+    - Updates `docs/application_state.json` (appends new state)  
+
+* **Keyword Matching & Similarity Analysis**  
+  - **Script**: `analyze.py`  
+  - Compares your resume and the job description.  
+  - Computes:  
+    - Word-matching statistics (frequency of key terms).  
+    - Cosine similarity score (0–1) to quantify document overlap.  
+  - Outputs results to stdout (JSON-like format).  
+
+* **Traceability & Audit Trail**  
+  - Every run produces `docs/application_state.json`, capturing:  
+    - Inputs (resume text, job ad text)  
+    - Intermediate LLM calls (keyword extraction, drafting)  
+    - Final outputs  
+
+* **Human-in-the-Loop Checkpoints**  
+  - After generating each draft (CV or motivation letter), CV-Pilot pauses so you can:  
+    - Review AI suggestions.  
+    - Edit for tone, clarity, or additional examples.  
 
 ---
 
 ## 🔧 Requirements
 
-1. **Python** ≥3.11.7 🐍
-2. **Crew AI & Tools**
-
-   * `crewai`, `crewai-tools`
-3. **Langtrace SDK** (optional) for tracing 🔍
-4. **LLM Provider** (e.g., OpenAI, Anthropic)
-
-   * Set `LLM_PROVIDER` and provider API key env vars
-5. **Network Access** for scraping & API calls 🌐
+1. **Python ≥ 3.11.7** 🐍  
+2. **Crew AI & Tools**  
+   - `crewai`, `crewai-tools` (provides `JobApplicationCrew`, `MotivationLetterCrew`)  
+3. **Langtrace SDK** (optional) 🔍  
+   - `langtrace-python-sdk` (for detailed tracing)  
+4. **LLM Provider** (e.g., OpenAI, Anthropic)  
+   - Environment variable `LLM_PROVIDER` (e.g., `"openai"`, `"anthropic"`)  
+   - Corresponding API key set in environment (e.g., `OPENAI_API_KEY`)  
+5. **Network Access** 🌐  
+   - Required for scraping public company websites and remote job postings  
 
 ---
 
 ## 🚀 Installation
 
-1. **Clone the Repo**
-
+1. **Clone the Repository**  
    ```bash
-   git clone https://github.com/your-org/cv-pilot.git
+   git clone https://github.com/gsantopaolo/cv-pilot.git
    cd cv-pilot
-   ```
-2. **Create & Activate Python Env**
+````
+
+2. **Create & Activate a Virtual Environment**
 
    ```bash
-# Create a Conda environment named "cv-pilot" with Python 3.9
-conda create --name cv-pilot python=3.9 -y 
-
-# Activate the environment
-conda activate cv-pilot 
-
-# Install dependencies from requirements.txt
-pip install -r requirements.txt 
-
+   python3 -m venv .venv
+   source .venv/bin/activate
+   pip install --upgrade pip
+   pip install -r requirements.txt
    ```
-3. **Configure Environment**
+
+3. **Configure Environment Variables**
 
    ```bash
-   export LANGTRACE_API_KEY="your_langtrace_key"
-   export LLM_PROVIDER="openai"
-   export OPENAI_API_KEY="your_openai_key"
+   export LANGTRACE_API_KEY="your_langtrace_key"       # Optional, for tracing
+   export LLM_PROVIDER="openai"                        # Or "anthropic", etc.
+   export OPENAI_API_KEY="your_openai_key"             # If using OpenAI
+   # If using Anthropic:
+   # export ANTHROPIC_API_KEY="your_anthropic_key"
    ```
+
+   * Make sure these variables are set before running any scripts.
+   * If you skip `LANGTRACE_API_KEY`, tracing is disabled but functionality remains.
 
 ---
 
 ## 🎬 Usage
 
-1. **Prepare Your `docs/` Folder**
+Before running, prepare:
 
-   * Place your resume as `cv_.md`.
-   * (Optional) Place the job ad as `job_advertise.md` if not using a URL.
-2. **Run the Resume Pipeline**
+* A **raw resume** file (e.g., `dcos/fake_resume.md`).
+* A **job description** file (e.g., `docs/job_advertise.md`).
+* For the motivation letter, a **company URL** and/or local job ad file.
 
-   ```bash
-   python3 gen_resume.py --doc_path ./docs \
-     [--job_posting_url "https://jobs.example.com/123"]
-   ```
+Below are examples using our sample files:
 
-   *Generates `docs/new_resume.md` & updates `application_state.json`.*
-3. **Review & Approve CV**
-   *Edit and confirm your tailored CV before proceeding.*
-4. **Run the Motivation Pipeline**
+* **Resume**: `dcos/fake_resume.md`
+* **Job Ad**: `docs/job_advertise.md`
 
-   ```bash
-   python3 gen_motivation.py \
-     --company_url "https://example.com" \
-     --job_posting_url "https://jobs.example.com/123" \
-     --doc_path ./docs
-   ```
+You can replace these with your own files or URLs.
 
-   *Generates `docs/motivation_letter.md` & updates `application_state.json`.*
-5. **Final Review**
-   *Inspect and refine your motivation letter.*
+---
+
+### 1. Generate a Tailored Resume (`gen_application.py`)
+
+This pipeline runs a `JobApplicationCrew` that:
+
+1. **Loads** and parses your **raw resume**.
+2. **Loads** and parses the **job description**.
+3. **Extracts** keywords and matches your skills/achievements.
+4. **Drafts** a tailored resume (`docs/new_resume.md`).
+5. **Writes** an audit trail (`docs/application_state.json`).
+
+**Example Command**
+
+```bash
+python3 src/gen_application.py \
+  --resume dcos/fake_resume.md \
+  --job_desc docs/job_advertise.md
+```
+
+* **Arguments**:
+
+  * `--resume   <path>` : Path to your raw resume (Markdown, TXT, or PDF).
+  * `--job_desc <path>` : Path to the job description file (plain text or Markdown).
+
+* **Outputs** (in `docs/`):
+
+  * `new_resume.md` : Your new, tailored resume.
+  * `application_state.json` : Detailed JSON state capturing all steps.
+
+👉 **Tip**: After running, open `docs/new_resume.md`, review AI edits, and tweak as needed. Then inspect `docs/application_state.json` to see how each piece was generated.
+
+---
+
+### 2. Generate a Motivation Letter (`gen_motivation.py`)
+
+This pipeline runs a `MotivationLetterCrew` that:
+
+1. **Scrapes** your **company’s URL** for mission, values, and culture.
+2. **Reads** the **job posting** (via a local Markdown file or remote URL).
+3. **Drafts** a 3-section motivation letter (`docs/motivation_letter.md`).
+4. **Appends** to `docs/application_state.json`.
+
+**Example Command (using local job ad)**
+
+```bash
+python3 src/gen_motivation.py \
+  --company_url "https://example-company.com" \
+  --doc_path docs
+```
+
+**Example Command (using remote job URL)**
+
+```bash
+python3 src/gen_motivation.py \
+  --company_url "https://example-company.com" \
+  --job_posting_url "https://jobs.example.com/12345" \
+  --doc_path docs
+```
+
+* **Arguments**:
+
+  * `--company_url      <URL>`   : Company website to scrape (HTML).
+  * `--job_posting_url  <URL>`   : (Optional) Remote job ad URL.
+  * `--doc_path         <dir>`   : Directory for reading/writing files (default `docs/`).
+
+* **Outputs** (in `docs/`):
+
+  * `motivation_letter.md` : AI-drafted cover letter.
+  * `application_state.json` : Updated JSON state (appended).
+
+👉 **Tip**: Review `docs/motivation_letter.md` and ensure company details are accurate. Edit tone or examples to match your voice before sending.
+
+---
+
+### 3. Analyze Keyword Matching & Similarity (`analyze.py`)
+
+This tool runs a `KeywordsAnalyzerTool` that:
+
+1. **Loads** your **resume** and **job description**.
+2. **Computes** word-matching statistics (how often each key term appears).
+3. **Computes** cosine similarity (score between 0 and 1).
+4. **Prints** a JSON-like summary to stdout (no files written).
+
+**Example Command**
+
+```bash
+python3 src/analyze.py \
+  --resume dcos/fake_resume.md \
+  --job_desc docs/job_advertise.md
+```
+
+* **Arguments**:
+
+  * `--resume   <path>` : Path to resume file (Markdown or plain text).
+  * `--job_desc <path>` : Path to job description file (Markdown or plain text).
+
+* **Example Output (stdout)**
+
+  ```json
+  {
+    "matched_keywords": {
+      "python": { "freq_in_resume": 5, "freq_in_job": 3 },
+      "docker": { "freq_in_resume": 2, "freq_in_job": 2 },
+      ...
+    },
+    "cosine_similarity": 0.72
+  }
+  ```
+
+👉 **Tip**: Use this to gauge how well your existing resume aligns. If similarity is low (< 0.5), tailoring is strongly recommended.
 
 ---
 
 ## 🔄 Process Overview
 
-### 1. Resume Generation (`gen_resume.py`)
+### 1. Resume Generation (`gen_application.py`)
 
-* **Extraction**: Gleans requirements from job posting.
-* **Profiling**: Matches your skills, achievements, and keywords.
-* **Tailoring**: Produces `new_resume.md`.
+1. **Load & Parse**
+
+   * Reads your resume (Markdown, TXT, or PDF-to-text).
+   * Reads the job description (Markdown or URL scrape).
+
+2. **Keyword Extraction**
+
+   * Identifies required skills, technologies, and responsibilities from the job ad.
+
+3. **Skill Matching & Tailoring**
+
+   * Finds relevant experiences, projects, and accomplishments in your raw CV.
+   * Reorders or rephrases bullet points to echo job-ad keywords.
+
+4. **Draft Output**
+
+   * Writes `docs/new_resume.md` (tailored CV).
+   * Saves full state in `docs/application_state.json`.
+
+---
 
 ### 2. Motivation Letter Generation (`gen_motivation.py`)
 
-* **Research**: Scrapes company site for mission, values, culture.
-* **Parsing**: Reads job ad (URL or Markdown).
-* **Drafting**: Writes intro, body, conclusion in `motivation_letter.md`.
+1. **Company Research**
+
+   * Scrapes the target company’s homepage for mission/values/culture.
+
+2. **Job Posting Parsing**
+
+   * Reads job ad (local Markdown or remote URL).
+
+3. **Drafting**
+
+   * Generates a structured letter:
+
+     * **Introduction**: Why you’re excited about this company and role.
+     * **Body**: Align your most relevant achievements & skills to their needs.
+     * **Conclusion**: Call to action and enthusiasm for next steps.
+
+4. **Output**
+
+   * Writes `docs/motivation_letter.md`.
+   * Appends new state to `docs/application_state.json`.
+
+---
+
+### 3. Keyword Matching & Similarity Analysis (`analyze.py`)
+
+1. **Load Texts**
+
+   * Reads resume and job description as plain text.
+
+2. **Compute Statistics**
+
+   * Counts occurrences of each required keyword in both docs.
+
+3. **Compute Cosine Similarity**
+
+   * Transforms texts into vector embeddings (TF-IDF or similar).
+   * Calculates similarity score (0.0 worst → 1.0 perfect match).
+
+4. **Output**
+
+   * Prints a JSON-like summary for quick review.
 
 ---
 
 ## 📝 Human-in-the-Loop Feedback
 
-* **Step 1**: After `gen_resume`, review and edit `new_resume.md`.
-* **Step 2**: After `gen_motivation`, review and edit `motivation_letter.md`.
-* **Feedback Tags**: Inline prompts (e.g., `<!-- REVIEW: ... -->`) guide your edits.
+1. **After Resume Generation**
+
+   * Inspect `docs/new_resume.md`.
+   * Edit tone, reorder sections, or add missing details.
+   * Remove any tags like `<!-- REVIEW: ... -->` once you’re happy.
+
+2. **After Motivation Letter Generation**
+
+   * Check `docs/motivation_letter.md`.
+   * Ensure company research snippets are accurate.
+   * Personalize any placeholders (e.g., recruiter name, specific metrics).
 
 ---
 
 ## ⚠️ Known Issues & Troubleshooting
 
-* **Filename Sensitivity**: Ensure `job_advertise.md` matches exactly or supply `--job_posting_url`.
-* **API Rate Limits**: Monitor usage to avoid LLM throttling.
-* **Scraping Blocks**: If company site blocks bots, provide a direct job posting URL.
-* **Inconsistent Outputs**: Pin `MODEL_NAME` env var for stable results.
-* **Cleanup**: Manually delete temporary files if needed.
+* **File Paths & Naming**
+
+  * Ensure `dcos/fake_resume.md` and `docs/job_advertise.md` exist, or update `--resume` / `--job_desc` flags.
+  * If `docs/` or `dcos/` doesn’t exist, create them or pass correct paths.
+
+* **Environment Variables**
+
+  * ❌ Missing `LLM_PROVIDER`:
+
+    ```bash
+    export LLM_PROVIDER="openai"
+    ```
+  * ❌ Missing API key:
+
+    ```bash
+    export OPENAI_API_KEY="your_key_here"
+    ```
+
+* **Scraping Blocks**
+
+  * If `gen_motivation.py` fails when scraping, the website might be blocking bots. Provide a local `docs/job_advertise.md` instead of a URL, or use a different URL.
+
+* **Inconsistent AI Outputs**
+
+  * AI drafts may vary each run. Pin your model version:
+
+    ```bash
+    export OPENAI_MODEL="gpt-4-0613"
+    ```
+
+* **PDF Resumes**
+
+  * If you pass a PDF and see parsing errors, convert to Markdown or plain text first (e.g., `pdftotext resume.pdf resume.txt`).
+
+* **Large `application_state.json`**
+
+  * This file grows with each run. If it becomes unwieldy, delete or archive it before re-running for a fresh start.
 
 ---
 
 ## 🚧 Next Steps
 
-* Support PDF/DOCX resume inputs for `gen_resume`.
-* Parallelize agent tasks within each pipeline for faster runs.
-* Integrate sentiment/tone analysis in motivation drafts.
-* Add a dashboard to visualize pipeline progress and state.
+* **Support Additional Resume Formats**
+
+  * Add native `.pdf`/`.docx` parsing in `gen_application.py` so you can pass PDFs directly.
+* **Parallelize Crew Workflows**
+
+  * Speed up multi-agent tasks by running keyword extraction and tailoring in parallel.
+* **Enhanced Analysis**
+
+  * In `analyze.py`, generate a bar chart of keyword frequencies or a word cloud.
+* **Dashboard & Visualization**
+
+  * Build a simple web dashboard (React or Streamlit) to visualize `application_state.json` over multiple applications.
+* **Integrate Tone/Sentiment Analysis**
+
+  * Add a step in `gen_motivation.py` to analyze sentiment/tone, ensuring your cover letter feels warm and genuine.
 
 ---
 
-## 📚 References
-
-* [Crew AI Documentation](https://docs.crewai.ai)
-* [Langtrace Python SDK](https://github.com/langtrace/langtrace-python)
-* [Agentic Workflow Patterns](https://crewai.ai/blog/agentic-workflows)
+✨ **Happy job hunting!** ✨
 
 
----
